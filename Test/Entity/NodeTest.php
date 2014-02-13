@@ -70,10 +70,32 @@ class NodeTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $node->status);
 		// Delete this node
 		$node->delete();
-		$this->assertNull($node->nid);
-		$this->assertNull($node->vid);
-		$this->assertNull($node->created);
-		$this->assertNull($node->updated);
+		// Node data should stay, but certain properties should go away
+		$this->assertFalse(isset($node->nid));
+		$this->assertFalse(isset($node->vid));
+		$this->assertFalse(isset($node->created));
+		$this->assertFalse(isset($node->updated));
+	}
+
+	public function testNodeSetFieldsDirectly() {
+		$node = Node::create($this->test_type);
+		$node->title = 'Test node';
+		$node->node->field_d7api_boolean_single['und'][0]['value'] = 1;
+		$node->save();
+		$this->assertEquals(1, $node->field_d7api_boolean_single);
+		$node->delete();
+	}
+
+	public function testNodeLoadByField() {
+		$node = Node::create($this->test_type);
+		$node->title = 'Test node';
+		$string = time();
+		$node->field_d7api_text_single = $string;
+		$node->save();
+		$nid = $node->nid;
+		$node = Node::load_by_field('field_d7api_text_single', $string);
+		$this->assertEquals($nid, $node->nid);
+		$node->delete();
 	}
 
 	public function testCckBoolean() {

@@ -72,3 +72,26 @@ $user->name = 'jbizzay';
 $user->mail = 'jbizzay@mail.net';
 $user->save();
 ```
+
+Modify a user's email
+
+```php
+$user = User::load(123);
+$user->mail = 'newmail@mail.net';
+$user->save();
+```
+
+Get current user:
+
+```php
+// Get the logged-in user
+$user = User::load();
+echo 'Welcome, '. $user->name .'!';
+```
+
+Do some more interesting stuff:
+
+```php
+$user = User::load();
+
+```
