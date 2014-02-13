@@ -15,6 +15,8 @@ class UserTest extends \PHPUnit_Framework_TestCase {
 	  $this->assertEquals(1, $user->status);
 	  $this->assertArrayHasKey(DRUPAL_AUTHENTICATED_RID, $user->roles);
 	  $this->assertNotEmpty($user->uid);
+
+	  $user->delete();
 	}
 
 }

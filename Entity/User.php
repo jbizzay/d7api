@@ -65,4 +65,9 @@ class User extends Entity {
 		return $roles;
 	}
 
+	public function delete() {
+		user_delete($this->user->uid);
+		$this->user = null;
+	}
+
 }
