@@ -1,12 +1,36 @@
 <?php namespace D7api\Entity;
+
 use D7api\Entity;
 
 class User extends Entity {
 
 	public $user;
 
-	protected function _load($uid) {
-		$this->user = user_load($uid);
+	public function __construct($uid = null) {
+		parent::__construct($uid);
+		if ($uid) {
+			$this->user = user_load($uid);
+			if ( ! $this->user) {
+				throw new \Exception("Invalid uid, couldn't load user.");
+			}
+		}
+	}
+
+	public function __get($name) {
+		if (method_exists($this, 'get_'. $name)) {
+			return $this->{'get_'. $name}();
+		}
+		if (isset($this->user->$name)) {
+			return $this->user->$name;
+		}
+	}
+
+	public function __set($name, $value) {
+		if (method_exists($this, 'set_'. $name)) {
+			return $this->{'set_'. $name}($value);
+		}
+		$this->user->$name = $value;
+		return;
 	}
 
 	public static function count($role = null) {
@@ -20,11 +44,22 @@ class User extends Entity {
 		return $query->execute()->fetchField();
 	}
 
-	public static function create($type = null) {
-
+	public static function create($email) {
+		$fields = array(
+			'name' => $email,
+			'mail' => $email,
+			'pass' => $password,
+			'status' => 1,
+			'init' => $email,
+			'roles' => array(
+				DRUPAL_AUTHENTICATED_RID => 'authenticated user'
+			)
+		);
+		$account = user_save('', $fields);
+		return static::load($account->uid);
 	}
 
-	public static function get_roles() {
+	public static function current_get_roles() {
 		$roles = user_roles(true);
 		unset($roles[2]);
 		return $roles;
