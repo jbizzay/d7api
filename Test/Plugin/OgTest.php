@@ -39,7 +39,31 @@ class OgTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(1 => 1), $members);
 		$group->add_user(static::$user->uid);
 		$members = $group->get_users();
-		$this->assertTrue($members[static::$user->uid] === $members[static::$user->uid]);
+		$this->assertNotEmpty($members[static::$user->uid]);
+		$group->remove_user(static::$user->uid);
+		$members = $group->get_users();
+		$this->assertEmpty($members[static::$user->uid]);
+	}
+
+	public function testGetUsersGroups() {
+		// Should start out not in any groups
+		$groups = Og::get_user_groups(static::$user->uid);
+		$this->assertEmpty($groups);
+		// Add user to group
+		$group = new Og(static::$node->nid);
+		$group->add_user(static::$user->uid);
+		// Get user's groups
+		$groups = Og::get_user_groups(static::$user->uid);
+		$this->assertNotEmpty($groups[static::$node->nid]);
+		// Get user's groups by type (doesn't exist)
+		$groups = Og::get_user_groups(static::$user->uid, 'nonexistant');
+		$this->assertEmpty($groups);
+		// Get user's groups by test type
+		$groups = Og::get_user_groups(static::$user->uid, static::$test_type);
+		$this->assertNotEmpty($groups[static::$node->nid]);
+		// Reset
+		$group->remove_user(static::$user->uid);
+		$this->assertEmpty(Og::get_user_groups(static::$user->uid));
 	}
 
 

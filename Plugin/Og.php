@@ -64,4 +64,30 @@ class Og {
 		og_ungroup('node', $this->node->nid, 'user', $uid);
 	}
 
+	/**
+	 * Get the groups this user belongs to.
+	 * 
+	 * @param  integer $uid
+	 * @param  boolean $type Restrict by group content type
+	 * @return array $groups
+	 */
+	public static function get_user_groups($uid, $type = null) {
+		$account = user_load($uid);
+		$groups = og_get_groups_by_user($account);
+		$return = array();
+		if ( ! empty($groups['node'])) {
+			foreach ($groups['node'] as $nid) {
+				if ($type) {
+					$node = node_load($nid);
+					if ($node->type == $type) {
+						$return[$nid] = $nid;
+					}
+				} else {
+					$return[$nid] = $nid;
+				}
+			}
+		}
+		return $return;
+	}
+
 }
