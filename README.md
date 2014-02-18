@@ -1,17 +1,9 @@
 d7api
 =====
 
-An OO wrapper for Drupal 7
+An api wrapper for Drupal 7 and doing various common tasks programmatically
 
-Programmatic operations on things like nodes, users, taxonomies etc... can be cumbersome as you have to go back and forth between inspecting the object you are trying to import, and tweaking your code until it *just works* Ever try to programmatically add an image to a node's image field? This task shouldn't take a day to surf forums and play with your code until it finally works. Rather:
 
-```php
-$node = Node::load(123);
-$file = File::upload('http://google.com/myimage.jpg');
-$file->save();
-$node->field_my_image = $file;
-$node->save();
-```
 
 Node
 -----
@@ -60,38 +52,82 @@ $node->save();
 User
 -----
 
-Create a user:
+Create a user with just an email address:
 
 ```php
-$user = User::create();
-// Exception is thrown if required fields aren't set
-$user->save(); // throws exception
+$user = User::create('jbizzay@mail.net');
+$user->save(); // If this user already exists, will throw exception
 
-$user = User::create();
-$user->name = 'jbizzay';
+// Defaults that get set:
+$user->name = 'jbizzay@mail.net'; // Email passed to ::create method
 $user->mail = 'jbizzay@mail.net';
-$user->save();
+$user->pass = '';
+$user->status = 1;
+$user->init = 'jbizzay@mail.net';
+$user->roles = array(DRUPAL_AUTHENTICATED_RID => 'authenticated user')
 ```
 
-Modify a user's email
+Load a user by uid, update username, email address
 
 ```php
-$user = User::load(123);
+$user = User::load(123); // Will throw an exception if user doesn't exist
+$user->name = 'newname';
 $user->mail = 'newmail@mail.net';
 $user->save();
 ```
 
-Get current user:
+Get current loggedin user:
 
 ```php
-// Get the logged-in user
 $user = User::load();
 echo 'Welcome, '. $user->name .'!';
 ```
 
-Do some more interesting stuff:
+Delete a user:
 
 ```php
-$user = User::load();
+$user = User::load(321);
+$user->delete();
+```
 
+Organic Groups
+-----
+
+Create a new og node (content type must already be setup as a group) and load into Og plugin
+
+```php
+$node = Node::create('group-type');
+$node->title = 'mygroup';
+$node->save();
+$group = new Og($node->nid);
+```
+
+Add user as member to the group:
+
+```php
+$group->add_user(123);
+```
+
+Check user is added:
+
+```php
+echo $group->has_user(123); // true
+```
+
+Remove user from group:
+
+```php
+$group->remove_user(123);
+```
+
+Get all the users in the group:
+
+```php
+$users = $group->get_users();
+```
+
+Get all the groups a user belongs to:
+
+```php
+$groups = Og::get_user_groups(321);
 ```
