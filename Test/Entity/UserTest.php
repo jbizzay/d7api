@@ -14,9 +14,21 @@ class UserTest extends \PHPUnit_Framework_TestCase {
 	  // Check defaults are set correctly
 	  $this->assertEquals(1, $user->status);
 	  $this->assertArrayHasKey(DRUPAL_AUTHENTICATED_RID, $user->roles);
+	  // User shouldn't be saved to db yet
+	  $this->assertEmpty($user->uid);
+	  // Save user
+	  $user->save();
 	  $this->assertNotEmpty($user->uid);
-
+	  $uid = $user->uid;
 	  $user->delete();
+
+	  // User doesn't exist, should throw exception
+	  try {
+	  	$user = User::load($uid);
+	  } catch (\Exception $e) {
+	  	return;
+	  }
+	  $this->fail('An expected exception has not been raised.');
 	}
 
 }

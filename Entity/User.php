@@ -23,6 +23,7 @@ class User extends Entity {
 		if (isset($this->user->$name)) {
 			return $this->user->$name;
 		}
+		return null;
 	}
 
 	public function __set($name, $value) {
@@ -45,18 +46,18 @@ class User extends Entity {
 	}
 
 	public static function create($email) {
-		$fields = array(
-			'name' => $email,
-			'mail' => $email,
-			'pass' => $password,
-			'status' => 1,
-			'init' => $email,
-			'roles' => array(
-				DRUPAL_AUTHENTICATED_RID => 'authenticated user'
-			)
+		$user = new \stdClass;
+		$user->name = $email;
+		$user->mail = $email;
+		$user->pass = '';
+		$user->status = 1;
+		$user->init = $email;
+		$user->roles = array(
+			DRUPAL_AUTHENTICATED_RID => 'authenticated user'
 		);
-		$account = user_save('', $fields);
-		return static::load($account->uid);
+		$d_user = new static;
+		$d_user->user = $user;
+		return $d_user;
 	}
 
 	public static function current_get_roles() {
@@ -68,6 +69,11 @@ class User extends Entity {
 	public function delete() {
 		user_delete($this->user->uid);
 		$this->user = null;
+	}
+
+	public function save() {
+		user_save($this->user);
+		return $this;
 	}
 
 }

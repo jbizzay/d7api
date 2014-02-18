@@ -16,6 +16,7 @@ class OgTest extends \PHPUnit_Framework_TestCase {
 		static::$node->title = 'mygroup';
 		static::$node->save();
 		static::$user = User::create('test@test.com');
+		static::$user->save();
 	}
 
 	public static function tearDownAfterClass() {

@@ -137,7 +137,6 @@ class Node extends Entity {
 	}
 
 	public function save() {
-		//node_submit($this->node);
 		node_save($this->node);
 		return $this;
 	}

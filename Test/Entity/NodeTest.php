@@ -1,6 +1,5 @@
 <?php namespace D7api\Test\Entity\Node;
 use D7api\Entity\Node;
-use Exception;
 
 class NodeTest extends \PHPUnit_Framework_TestCase {
 
@@ -42,7 +41,7 @@ class NodeTest extends \PHPUnit_Framework_TestCase {
 	public function testNodeCreateNonExistantTypeThrowsException() {
 		try {
 			$node = Node::create('unknown');
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			return;
 		}
 		$this->fail('An expected exception has not been raised.');
